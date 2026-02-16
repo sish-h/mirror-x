@@ -16,6 +16,10 @@ init_database()
 from data import get_available_subjects
 from analysis import analyze_study_data, detect_behavioral_patterns, get_recent_data, calculate_streak
 
+@app.context_processor
+def inject_now():
+    return {'now': datetime.now()}
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
