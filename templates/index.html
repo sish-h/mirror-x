@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MIRROR-X - Study Intelligence System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🪞</span>
+                    <span class="logo-text">MIRROR-X</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item active">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="/log" class="nav-item">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Log Study</span>
+                </a>
+                <a href="/analysis" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analysis</span>
+                </a>
+                <a href="/mirror" class="nav-item">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Mirror Report</span>
+                </a>
+                <a href="/timeline" class="nav-item">
+                    <span class="nav-icon">📅</span>
+                    <span class="nav-text">Timeline</span>
+                </a>
+                <a href="/transformation" class="nav-item">
+                    <span class="nav-icon">⚡</span>
+                    <span class="nav-text">Transformation</span>
+                </a>
+                <a href="/competitor" class="nav-item">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">AI Competitor</span>
+                </a>
+                <a href="/plan" class="nav-item">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">AI Study Plan</span>
+                </a>
+                <a href="/streak" class="nav-item">
+                    <span class="nav-icon">🔥</span>
+                    <span class="nav-text">Streak History</span>
+                </a>
+                <a href="/leaderboard" class="nav-item">
+                    <span class="nav-icon">🏆</span>
+                    <span class="nav-text">Leaderboard</span>
+                </a>
+                <a href="/chat" class="nav-item">
+                    <span class="nav-icon">💬</span>
+                    <span class="nav-text">AI Chat</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <span>{{ user.username[0]|upper }}</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">{{ user.username }}</span>
+                        <a href="/logout" class="logout-btn">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-left">
+                    <h1>Dashboard</h1>
+                    <p class="header-subtitle">Track your study performance and patterns</p>
+                </div>
+                <div class="header-right">
+                    <div class="date-display">
+                        <span>{{ "now"|strftime("%B %d, %Y") }}</span>
+                    </div>
+                </div>
+            </header>
+
+            {% if has_data %}
+            <!-- Grade Card -->
+            <div class="grade-section">
+                {% if not top_one_percent %}
+                <div class="locked-message">
+                    <div class="lock-icon">🔒</div>
+                    <div class="lock-text">
+                        <h3>Top 1% Mode Locked</h3>
+                        <p>You're not there yet.</p>
+                        <div class="requirements">
+                            <div class="requirement">
+                                <span class="req-icon">💪</span>
+                                <span class="req-text">Discipline > 80</span>
+                            </div>
+                            <div class="requirement">
+                                <span class="req-icon">📅</span>
+                                <span class="req-text">Consistency > 75%</span>
+                            </div>
+                            <div class="requirement">
+                                <span class="req-icon">⏱️</span>
+                                <span class="req-text">Total Hours > 20</span>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                <div class="unlocked-message">
+                    <div class="unlock-icon">🏆</div>
+                    <div class="unlock-text">
+                        <h3>Top 1% Mode Unlocked</h3>
+                        <p>You've earned elite status.</p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Metrics Grid -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <h3>Total Study Hours</h3>
+                        <span class="metric-icon">⏱️</span>
+                    </div>
+                    <div class="metric-value">{{ "%.1f"|format(total_hours) }}</div>
+                    <div class="metric-change positive">
+                        <span>Keep it up!</span>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <h3>Reality Score</h3>
+                        <span class="metric-icon">🎯</span>
+                    </div>
+                    <div class="metric-value {{ 'score-high' if reality_score > 70 else 'score-medium' if reality_score > 40 else 'score-low' }}">
+                        {{ reality_score }}/100
+                    </div>
+                    <div class="metric-change {{ 'positive' if reality_score > 60 else 'negative' }}">
+                        <span>{{ 'Good self-awareness' if reality_score > 60 else 'Needs improvement' }}</span>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <h3>Discipline Score</h3>
+                        <span class="metric-icon">💪</span>
+                    </div>
+                    <div class="metric-value {{ 'score-high' if discipline_score > 70 else 'score-medium' if discipline_score > 40 else 'score-low' }}">
+                        {{ discipline_score }}/100
+                    </div>
+                    <div class="metric-change {{ 'positive' if discipline_score > 60 else 'negative' }}">
+                        <span>{{ 'Strong discipline' if discipline_score > 60 else 'Build consistency' }}</span>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-header">
+                        <h3>Avoidance Score</h3>
+                        <span class="metric-icon">🚫</span>
+                    </div>
+                    <div class="metric-value {{ 'score-high' if avoidance_score < 30 else 'score-medium' if avoidance_score < 60 else 'score-low' }}">
+                        {{ avoidance_score }}/100
+                    </div>
+                    <div class="metric-change {{ 'positive' if avoidance_score < 40 else 'negative' }}">
+                        <span>{{ 'Facing challenges' if avoidance_score < 40 else 'Some avoidance detected' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-section">
+                <h2>Study Summary</h2>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="summary-icon">📅</div>
+                        <div class="summary-content">
+                            <h4>Consistency</h4>
+                            <div class="summary-value">
+                                <span class="value-number">{{ "%.1f"|format(consistency) }}%</span>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{ consistency }}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <div class="summary-icon">🔥</div>
+                        <div class="summary-content">
+                            <h4>Current Streak</h4>
+                            <div class="summary-value">
+                                <span class="value-number">{{ streak_data.current_streak }}</span>
+                                <span class="value-label">days</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <div class="summary-icon">🏆</div>
+                        <div class="summary-content">
+                            <h4>Longest Streak</h4>
+                            <div class="summary-value">
+                                <span class="value-number">{{ streak_data.longest_streak }}</span>
+                                <span class="value-label">days</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <div class="summary-icon">📚</div>
+                        <div class="summary-content">
+                            <h4>Total Sessions</h4>
+                            <div class="summary-value">
+                                <span class="value-number">{{ total_sessions }}</span>
+                                <span class="value-label">sessions</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-icon">📚</div>
+                <h2>Welcome to MIRROR-X, {{ user.username }}!</h2>
+                <p>Start tracking your study sessions to get personalized insights and brutal honesty about your habits.</p>
+                <a href="/log" class="cta-button">
+                    <span>Log Your First Session</span>
+                    <span class="button-arrow">→</span>
+                </a>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+
+    {% if failure_alert %}
+            <div class="failure-alert {{ failure_alert.risk_level|lower }}">
+                <div class="alert-header">
+                    <span class="alert-icon">⚠️</span>
+                    <span class="alert-title">Failure Alert</span>
+                    <span class="risk-level {{ failure_alert.risk_level|lower }}">{{ failure_alert.risk_level }}</span>
+                </div>
+                <div class="alert-message">{{ failure_alert.message }}</div>
+                <div class="alert-details">
+                    {% for alert in failure_alert.alerts %}
+                    <div class="alert-item">• {{ alert }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="alert {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+</body>
+</html>

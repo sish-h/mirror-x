@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Competitor - MIRROR-X</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🪞</span>
+                    <span class="logo-text">MIRROR-X</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="/log" class="nav-item">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Log Study</span>
+                </a>
+                <a href="/analysis" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analysis</span>
+                </a>
+                <a href="/mirror" class="nav-item">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Mirror Report</span>
+                </a>
+                <a href="/streak" class="nav-item">
+                    <span class="nav-icon">🔥</span>
+                    <span class="nav-text">Streak History</span>
+                </a>
+                <a href="/leaderboard" class="nav-item">
+                    <span class="nav-icon">🏆</span>
+                    <span class="nav-text">Leaderboard</span>
+                </a>
+                <a href="/competitor" class="nav-item active">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">AI Competitor</span>
+                </a>
+                <a href="/plan" class="nav-item">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">AI Study Plan</span>
+                </a>
+                <a href="/chat" class="nav-item">
+                    <span class="nav-icon">💬</span>
+                    <span class="nav-text">AI Chat</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <span>{{ user.username[0]|upper }}</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">{{ user.username }}</span>
+                        <a href="/logout" class="logout-btn">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-left">
+                    <h1>AI Competitor</h1>
+                    <p class="header-subtitle">You vs Rival</p>
+                </div>
+                <div class="header-right">
+                    <button onclick="updateCompetitor()" class="update-btn">
+                        <span>🔄</span>
+                        <span>Update Rival</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="competitor-content">
+                {% if competitor %}
+                <div class="comparison-header">
+                    <h2>You vs {{ competitor.name }}</h2>
+                    <p class="competitor-message">{{ comparison.message }}</p>
+                </div>
+                
+                <div class="metrics-comparison">
+                    <div class="comparison-grid">
+                        <div class="metric-comparison">
+                            <div class="user-metric">
+                                <div class="metric-header">
+                                    <h3>You</h3>
+                                    <div class="metric-avatar">{{ user.username[0]|upper }}</div>
+                                </div>
+                                <div class="metric-value">{{ "%.1f"|format(user_hours) if user_hours else 0 }}</div>
+                                <div class="metric-label">Total Hours</div>
+                            </div>
+                            <div class="competitor-metric">
+                                <div class="metric-header">
+                                    <h3>{{ competitor.name }}</h3>
+                                    <div class="metric-avatar">{{ competitor.avatar }}</div>
+                                </div>
+                                <div class="metric-value {{ 'better' if comparison.hours_diff > 0 else 'worse' }}">{{ "%.1f"|format(competitor.total_hours) }}</div>
+                                <div class="metric-label">Total Hours</div>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-comparison">
+                            <div class="user-metric">
+                                <div class="metric-header">
+                                    <h3>You</h3>
+                                    <div class="metric-avatar">{{ user.username[0]|upper }}</div>
+                                </div>
+                                <div class="metric-value">{{ user_scores.discipline_score if user_scores.discipline_score else 0 }}</div>
+                                <div class="metric-label">Discipline Score</div>
+                            </div>
+                            <div class="competitor-metric">
+                                <div class="metric-header">
+                                    <h3>{{ competitor.name }}</h3>
+                                    <div class="metric-avatar">{{ competitor.avatar }}</div>
+                                </div>
+                                <div class="metric-value {{ 'better' if comparison.discipline_diff > 0 else 'worse' }}">{{ competitor.discipline_score }}</div>
+                                <div class="metric-label">Discipline Score</div>
+                            </div>
+                        </div>
+                        
+                        <div class="metric-comparison">
+                            <div class="user-metric">
+                                <div class="metric-header">
+                                    <h3>You</h3>
+                                    <div class="metric-avatar">{{ user.username[0]|upper }}</div>
+                                </div>
+                                <div class="metric-value">{{ analysis.current_streak if analysis.current_streak else 0 }}</div>
+                                <div class="metric-label">Current Streak</div>
+                            </div>
+                            <div class="competitor-metric">
+                                <div class="metric-header">
+                                    <h3>{{ competitor.name }}</h3>
+                                    <div class="metric-avatar">{{ competitor.avatar }}</div>
+                                </div>
+                                <div class="metric-value {{ 'better' if comparison.streak_diff > 0 else 'worse' }}">{{ competitor.current_streak }}</div>
+                                <div class="metric-label">Current Streak</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="motivation-section">
+                    <h3>How to Beat {{ competitor.name }}</h3>
+                    <div class="motivation-list">
+                        <div class="motivation-item">
+                            <span class="motivation-icon">📈</span>
+                            <span class="motivation-text">Study {{ competitor.subject }} consistently</span>
+                        </div>
+                        <div class="motivation-item">
+                            <span class="motivation-icon">⏱️</span>
+                            <span class="motivation-text">Maintain daily discipline</span>
+                        </div>
+                        <div class="motivation-item">
+                            <span class="motivation-icon">🔥</span>
+                            <span class="motivation-text">Never break your streak</span>
+                        </div>
+                        <div class="motivation-item">
+                            <span class="motivation-icon">💪</span>
+                            <span class="motivation-text">Focus on quality over quantity</span>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">🤖</div>
+                    <h2>No Competitor Data</h2>
+                    <p>Start logging study sessions to generate your AI rival.</p>
+                    <a href="/log" class="cta-button">
+                        <span>Start Studying</span>
+                        <span class="button-arrow">→</span>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function updateCompetitor() {
+            fetch('/update_competitor', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to update competitor: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating competitor');
+            });
+        }
+    </script>
+</body>
+</html>

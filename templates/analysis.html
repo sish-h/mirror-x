@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis - MIRROR-X</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <h1>MIRROR-X</h1>
+            <div class="nav-links">
+                <a href="/" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="/log" class="nav-item">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Log Study</span>
+                </a>
+                <a href="/analysis" class="nav-item active">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analysis</span>
+                </a>
+                <a href="/leaderboard" class="nav-item">
+                    <span class="nav-icon">🏆</span>
+                    <span class="nav-text">Leaderboard</span>
+                </a>
+                <a href="/mirror" class="nav-item">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Mirror Report</span>
+                </a>
+                <a href="/chat" class="nav-item">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">AI Chat</span>
+                </a>
+                <a href="/logout" class="logout-link">Logout</a>
+            </div>
+            <div class="user-info">
+                <span>👤 {{ user.username }}</span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        {% if has_data %}
+        <div class="analysis-container">
+            <h2>Study Analysis</h2>
+            
+            <div class="graphs-section">
+                <div class="graph-container">
+                    <h3>Subject Distribution</h3>
+                    <img src="data:image/png;base64,{{ subject_graph }}" alt="Subject Distribution">
+                </div>
+                
+                <div class="graph-container">
+                    <h3>Daily Study Hours</h3>
+                    <img src="data:image/png;base64,{{ daily_graph }}" alt="Daily Hours">
+                </div>
+            </div>
+
+            <div class="sessions-section">
+                <h3>Study Sessions</h3>
+                <div class="table-container">
+                    <table class="sessions-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Subject</th>
+                                <th>Hours</th>
+                                <th>Difficulty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for session in sessions %}
+                            <tr>
+                                <td>{{ session.date }}</td>
+                                <td>{{ session.subject }}</td>
+                                <td>{{ "%.1f"|format(session.hours) }}</td>
+                                <td>
+                                    <span class="difficulty-badge {{ session.difficulty }}">
+                                        {{ session.difficulty|title }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h2>No Analysis Data</h2>
+            <p>No study data found. Start logging your study sessions to see analysis.</p>
+            <a href="/log" class="cta-button">Log First Session</a>
+        </div>
+        {% endif %}
+    </main>
+</body>
+</html>

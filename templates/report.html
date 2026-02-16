@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Reality Report - MIRROR-X</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🪞</span>
+                    <span class="logo-text">MIRROR-X</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="/log" class="nav-item">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Log Study</span>
+                </a>
+                <a href="/analysis" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analysis</span>
+                </a>
+                <a href="/mirror" class="nav-item">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Mirror Report</span>
+                </a>
+                <a href="/report" class="nav-item active">
+                    <span class="nav-icon">📄</span>
+                    <span class="nav-text">Weekly Report</span>
+                </a>
+                <a href="/leaderboard" class="nav-item">
+                    <span class="nav-icon">🏆</span>
+                    <span class="nav-text">Leaderboard</span>
+                </a>
+                <a href="/chat" class="nav-item">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">AI Chat</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <span>{{ user.username[0].upper() }}</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">{{ user.username }}</span>
+                        <a href="/logout" class="logout-btn">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-left">
+                    <h1>Weekly Reality Report</h1>
+                    <p class="header-subtitle">Brutal honesty about your weekly performance</p>
+                </div>
+                <div class="header-right">
+                    <button onclick="generateReport()" class="generate-btn">
+                        <span>🔄</span>
+                        <span>Generate Report</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="report-content">
+                {% if report_data %}
+                <!-- Report Header -->
+                <div class="report-header-card">
+                    <div class="report-title">
+                        <h2>Weekly Reality Report</h2>
+                        <p class="report-period">{{ report_data.week_range }}</p>
+                    </div>
+                    <div class="report-grade {{ report_data.grade_class }}">
+                        <span class="grade-letter">{{ report_data.grade }}</span>
+                        <span class="grade-label">{{ report_data.grade_text }}</span>
+                    </div>
+                </div>
+
+                <!-- Key Insights -->
+                <div class="insights-grid">
+                    <div class="insight-card best-day">
+                        <div class="insight-header">
+                            <span class="insight-icon">🏆</span>
+                            <h3>Best Day</h3>
+                        </div>
+                        <div class="insight-content">
+                            <div class="day-name">{{ report_data.best_day.day }}</div>
+                            <div class="day-stats">
+                                <span class="hours">{{ report_data.best_day.hours }}h</span>
+                                <span class="sessions">{{ report_data.best_day.sessions }} sessions</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insight-card worst-day">
+                        <div class="insight-header">
+                            <span class="insight-icon">💀</span>
+                            <h3>Worst Day</h3>
+                        </div>
+                        <div class="insight-content">
+                            <div class="day-name">{{ report_data.worst_day.day }}</div>
+                            <div class="day-stats">
+                                <span class="hours">{{ report_data.worst_day.hours }}h</span>
+                                <span class="sessions">{{ report_data.worst_day.sessions }} sessions</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="insight-card biggest-mistake">
+                        <div class="insight-header">
+                            <span class="insight-icon">🚫</span>
+                            <h3>Biggest Mistake</h3>
+                        </div>
+                        <div class="insight-content">
+                            <div class="mistake-title">{{ report_data.biggest_mistake.title }}</div>
+                            <div class="mistake-description">{{ report_data.biggest_mistake.description }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Harsh Truth -->
+                <div class="harsh-truth-card">
+                    <div class="truth-header">
+                        <span class="truth-icon">🔥</span>
+                        <h3>Harsh Truth</h3>
+                    </div>
+                    <div class="truth-content">
+                        <p>{{ report_data.harsh_truth }}</p>
+                    </div>
+                </div>
+
+                <!-- Export Options -->
+                <div class="export-section">
+                    <h3>Export Report</h3>
+                    <div class="export-buttons">
+                        <button onclick="copyToClipboard()" class="export-btn copy-btn">
+                            <span>📋</span>
+                            <span>Copy Text</span>
+                        </button>
+                        <button onclick="downloadReport()" class="export-btn download-btn">
+                            <span>💾</span>
+                            <span>Download File</span>
+                        </button>
+                        <button onclick="shareReport()" class="export-btn share-btn">
+                            <span>🔗</span>
+                            <span>Share Link</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Report Text (Hidden for copying) -->
+                <textarea id="reportText" style="display: none;">{{ report_data.full_text }}</textarea>
+
+                {% else %}
+                <!-- Empty State -->
+                <div class="empty-state">
+                    <div class="empty-icon">📄</div>
+                    <h2>No Weekly Report Yet</h2>
+                    <p>Generate your weekly reality report to see insights about your study patterns and performance.</p>
+                    <button onclick="generateReport()" class="cta-button">
+                        <span>Generate Report</span>
+                        <span class="button-arrow">→</span>
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function generateReport() {
+            window.location.href = '/report?generate=true';
+        }
+
+        function copyToClipboard() {
+            const reportText = document.getElementById('reportText');
+            reportText.select();
+            document.execCommand('copy');
+            
+            // Show feedback
+            const btn = event.target.closest('.copy-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span>✅</span><span>Copied!</span>';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+            }, 2000);
+        }
+
+        function downloadReport() {
+            const reportText = document.getElementById('reportText').value;
+            const blob = new Blob([reportText], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `mirror-x-weekly-report-${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+            
+            // Show feedback
+            const btn = event.target.closest('.download-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span>✅</span><span>Downloaded!</span>';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+            }, 2000);
+        }
+
+        function shareReport() {
+            const reportText = document.getElementById('reportText').value;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'MIRROR-X Weekly Report',
+                    text: reportText.substring(0, 200) + '...'
+                });
+            } else {
+                // Fallback: copy to clipboard
+                copyToClipboard();
+            }
+        }
+    </script>
+</body>
+</html>

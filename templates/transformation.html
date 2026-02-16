@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformation Mode - MIRROR-X</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🪞</span>
+                    <span class="logo-text">MIRROR-X</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="/log" class="nav-item">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Log Study</span>
+                </a>
+                <a href="/analysis" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analysis</span>
+                </a>
+                <a href="/mirror" class="nav-item">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Mirror Report</span>
+                </a>
+                <a href="/streak" class="nav-item">
+                    <span class="nav-icon">🔥</span>
+                    <span class="nav-text">Streak History</span>
+                </a>
+                <a href="/leaderboard" class="nav-item">
+                    <span class="nav-icon">🏆</span>
+                    <span class="nav-text">Leaderboard</span>
+                </a>
+                <a href="/timeline" class="nav-item">
+                    <span class="nav-icon">📅</span>
+                    <span class="nav-text">Timeline</span>
+                </a>
+                <a href="/transformation" class="nav-item active">
+                    <span class="nav-icon">⚡</span>
+                    <span class="nav-text">Transformation</span>
+                </a>
+                <a href="/competitor" class="nav-item">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">AI Competitor</span>
+                </a>
+                <a href="/plan" class="nav-item">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">AI Study Plan</span>
+                </a>
+                <a href="/chat" class="nav-item">
+                    <span class="nav-icon">💬</span>
+                    <span class="nav-text">AI Chat</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <span>{{ user.username[0]|upper }}</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">{{ user.username }}</span>
+                        <a href="/logout" class="logout-btn">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-left">
+                    <h1>Transformation Mode</h1>
+                    <p class="header-subtitle">No comfort, no easy subjects bias, high accountability</p>
+                </div>
+                <div class="header-right">
+                    {% if transformation_active %}
+                        <button onclick="deactivateTransformation()" class="deactivate-btn">
+                            <span>⚡</span>
+                            <span>Exit Mode</span>
+                        </button>
+                    {% else %}
+                        <button onclick="activateTransformation()" class="activate-btn">
+                            <span>⚡</span>
+                            <span>Fix Me</span>
+                        </button>
+                    {% endif %}
+                </div>
+            </header>
+
+            <div class="transformation-content">
+                {% if transformation_active %}
+                    <div class="active-mode">
+                        <div class="mode-header">
+                            <h2>Transformation Mode Active</h2>
+                            <p class="mode-message">This is the version of you that wins.</p>
+                        </div>
+                        
+                        <div class="weak-areas">
+                            <h3>Your Weak Areas:</h3>
+                            <div class="weak-list">
+                                {% for area in strict_schedule.weak_areas %}
+                                <div class="weak-item">{{ area }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="strict-schedule">
+                            <h3>Strict Schedule</h3>
+                            <div class="schedule-info">
+                                <p class="schedule-message">No flexibility, high discipline, maximum accountability</p>
+                                <p class="schedule-date">Started: {{ strict_schedule.start_date }}</p>
+                            </div>
+                            
+                            <div class="schedule-grid">
+                                {% for day in strict_schedule.schedule %}
+                                <div class="schedule-item">
+                                    <div class="day-header">
+                                        <span class="day-name">{{ day.day }}</span>
+                                        <span class="day-date">{{ day.date }}</span>
+                                    </div>
+                                    <div class="day-content">
+                                        <div class="time-slot">{{ day.time }}</div>
+                                        <div class="subject">{{ day.subject }}</div>
+                                        <div class="duration">{{ day.duration }}h</div>
+                                        <div class="difficulty {{ day.difficulty }}">{{ day.difficulty }}</div>
+                                    </div>
+                                    <div class="notes">{{ day.notes }}</div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="inactive-mode">
+                        <div class="mode-header">
+                            <h2>Transformation Mode Inactive</h2>
+                            <p class="mode-message">Click "Fix Me" to activate strict accountability mode</p>
+                        </div>
+                        
+                        <div class="mode-features">
+                            <h3>What Transformation Mode Does:</h3>
+                            <div class="features-list">
+                                <div class="feature-item">
+                                    <span class="feature-icon">🎯</span>
+                                    <span class="feature-text">Generates strict schedule</span>
+                                </div>
+                                <div class="feature-item">
+                                    <span class="feature-icon">⚡</span>
+                                    <span class="feature-text">Removes flexibility</span>
+                                </div>
+                                <div class="feature-item">
+                                    <span class="feature-icon">💪</span>
+                                    <span class="feature-text">Eliminates easy subject bias</span>
+                                </div>
+                                <div class="feature-item">
+                                    <span class="feature-icon">🔥</span>
+                                    <span class="feature-text">Enforces high discipline</span>
+                                </div>
+                                <div class="feature-item">
+                                    <span class="feature-icon">📋</span>
+                                    <span class="feature-text">Maximum accountability</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mode-action">
+                            <button onclick="activateTransformation()" class="activate-btn">
+                                <span>⚡</span>
+                                <span>Fix Me</span>
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function activateTransformation() {
+            if (confirm('Are you ready to activate Transformation Mode? This will generate a strict schedule with no flexibility and maximum accountability. You cannot exit this mode easily.')) {
+                fetch('/activate_transformation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Failed to activate transformation mode: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error activating transformation mode');
+                });
+            }
+        }
+        
+        function deactivateTransformation() {
+            fetch('/deactivate_transformation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Failed to deactivate transformation mode: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error deactivating transformation mode');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

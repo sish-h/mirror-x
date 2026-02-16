@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Streak History - MIRROR-X</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🪞</span>
+                    <span class="logo-text">MIRROR-X</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="/log" class="nav-item">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Log Study</span>
+                </a>
+                <a href="/analysis" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analysis</span>
+                </a>
+                <a href="/mirror" class="nav-item">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Mirror Report</span>
+                </a>
+                <a href="/leaderboard" class="nav-item">
+                    <span class="nav-icon">🏆</span>
+                    <span class="nav-text">Leaderboard</span>
+                </a>
+                <a href="/streak" class="nav-item active">
+                    <span class="nav-icon">🔥</span>
+                    <span class="nav-text">Streak History</span>
+                </a>
+                <a href="/chat" class="nav-item">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">AI Chat</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <span>{{ user.username[0]|upper }}</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">{{ user.username }}</span>
+                        <a href="/logout" class="logout-btn">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-left">
+                    <h1>Streak History</h1>
+                    <p class="header-subtitle">Track your daily study consistency</p>
+                </div>
+                <div class="header-right">
+                    <div class="streak-summary">
+                        <div class="current-streak-display">
+                            <span class="streak-number">{{ streak_data.current_streak }}</span>
+                            <span class="streak-label">Current Streak</span>
+                        </div>
+                        <div class="longest-streak-display">
+                            <span class="streak-number">{{ streak_data.longest_streak }}</span>
+                            <span class="streak-label">Longest Streak</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="streak-content">
+                <!-- Streak Calendar -->
+                <div class="streak-calendar-section">
+                    <h2>Study Calendar</h2>
+                    <div class="calendar-grid">
+                        {% for day in calendar_days %}
+                        <div class="calendar-day {{ 'studied' if day.studied else 'missed' }}">
+                            <div class="day-number">{{ day.day }}</div>
+                            <div class="day-status">
+                                {% if day.studied %}
+                                    <span class="status-icon">✅</span>
+                                {% else %}
+                                    <span class="status-icon">❌</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Streak Stats -->
+                <div class="streak-stats-section">
+                    <h2>Streak Statistics</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">🔥</div>
+                            <div class="stat-content">
+                                <h3>Current Streak</h3>
+                                <div class="stat-value">{{ streak_data.current_streak }} days</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">🏆</div>
+                            <div class="stat-content">
+                                <h3>Longest Streak</h3>
+                                <div class="stat-value">{{ streak_data.longest_streak }} days</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-content">
+                                <h3>Days Studied This Month</h3>
+                                <div class="stat-value">{{ monthly_days_studied }} days</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-content">
+                                <h3>Study Rate</h3>
+                                <div class="stat-value">{{ "%.1f"|format(monthly_study_rate) }}%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Streaks -->
+                <div class="recent-streaks-section">
+                    <h2>Recent Streak Periods</h2>
+                    <div class="streak-list">
+                        {% for streak in recent_streaks %}
+                        <div class="streak-item">
+                            <div class="streak-period">
+                                <span class="period-start">{{ streak.start_date }}</span>
+                                <span class="period-arrow">→</span>
+                                <span class="period-end">{{ streak.end_date }}</span>
+                            </div>
+                            <div class="streak-length">
+                                <span class="length-number">{{ streak.length }}</span>
+                                <span class="length-label">days</span>
+                            </div>
+                            <div class="streak-status {{ 'active' if streak.active else 'completed' }}">
+                                {% if streak.active %}
+                                    <span class="status-icon">🔥</span>
+                                    <span class="status-text">Active</span>
+                                {% else %}
+                                    <span class="status-icon">✅</span>
+                                    <span class="status-text">Completed</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

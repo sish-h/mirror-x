@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mirror Report - MIRROR-X</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <h1>MIRROR-X</h1>
+            <div class="nav-links">
+                <a href="/">Dashboard</a>
+                <a href="/log">Log Study</a>
+                <a href="/analysis">Analysis</a>
+                <a href="/mirror" class="active">Mirror Report</a>
+                <a href="/chat">AI Chat</a>
+                <a href="/logout" class="logout-link">Logout</a>
+            </div>
+            <div class="user-info">
+                <span>👤 {{ user.username }}</span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        {% if has_data %}
+        <div class="mirror-container">
+            <div class="mirror-header">
+                <h2>🪞 Mirror-X Report</h2>
+                <p>Brutal truth about your study habits</p>
+            </div>
+
+            <div class="scores-section">
+                <h3>Performance Scores</h3>
+                <div class="scores-grid">
+                    <div class="score-card">
+                        <h4>Reality Score</h4>
+                        <div class="score-value {{ 'good' if scores.reality_score > 60 else 'bad' }}">
+                            {{ scores.reality_score }}/100
+                        </div>
+                    </div>
+                    
+                    <div class="score-card">
+                        <h4>Discipline Score</h4>
+                        <div class="score-value {{ 'good' if scores.discipline_score > 60 else 'bad' }}">
+                            {{ scores.discipline_score }}/100
+                        </div>
+                    </div>
+                    
+                    <div class="score-card">
+                        <h4>Avoidance Score</h4>
+                        <div class="score-value {{ 'good' if scores.avoidance_score < 40 else 'bad' }}">
+                            {{ scores.avoidance_score }}/100
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="patterns-section">
+                <h3>Detected Patterns</h3>
+                <div class="patterns-list">
+                    {% if patterns %}
+                        {% for pattern in patterns %}
+                        <a href="/plan" class="pattern-item">
+                            <span class="pattern-icon">⚠️</span>
+                            <span class="pattern-text">{{ pattern }}</span>
+                        </a>
+                        {% endfor %}
+                    {% else %}
+                        <div class="pattern-item">
+                            <span class="pattern-icon">✅</span>
+                            <span class="pattern-text">No negative patterns detected</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="hidden-patterns-section">
+                <h3>Hidden Patterns</h3>
+                <div class="hidden-patterns-list">
+                    {% if analysis.hidden_patterns %}
+                        {% for pattern in analysis.hidden_patterns %}
+                        <div class="hidden-pattern-item">
+                            <div class="pattern-header">
+                                <span class="pattern-icon">🔍</span>
+                                <span class="pattern-title">{{ pattern.pattern|replace('_', ' ')|title }}</span>
+                                <span class="pattern-severity {{ pattern.severity }}">{{ pattern.severity|upper }}</span>
+                            </div>
+                            <div class="pattern-description">{{ pattern.description }}</div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-patterns">
+                            <span class="pattern-icon">✅</span>
+                            <span class="pattern-text">No hidden patterns detected</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="truth-section">
+                <h3>🔥 Brutal Truth</h3>
+                <div class="truth-list">
+                    {% for statement in truth_statements %}
+                    <div class="truth-item">
+                        <span class="truth-number">{{ loop.index }}.</span>
+                        <span class="truth-text">{{ statement }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="summary-section">
+                <h3>Study Summary</h3>
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <span class="label">Total Hours</span>
+                        <span class="value">{{ "%.1f"|format(analysis.total_hours) }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Total Sessions</span>
+                        <span class="value">{{ analysis.total_sessions }}</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Consistency</span>
+                        <span class="value">{{ "%.1f"|format(analysis.consistency) }}%</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="label">Current Streak</span>
+                        <span class="value">{{ analysis.current_streak }} days</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h2>No Mirror Data</h2>
+            <p>No study data found. Start logging your study sessions to get your Mirror report.</p>
+            <a href="/log" class="cta-button">Log First Session</a>
+        </div>
+        {% endif %}
+    </main>
+</body>
+</html>

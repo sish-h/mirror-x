@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat - MIRROR-X</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <h1>MIRROR-X</h1>
+            <div class="nav-links">
+                <a href="/">Dashboard</a>
+                <a href="/log">Log Study</a>
+                <a href="/analysis">Analysis</a>
+                <a href="/mirror">Mirror Report</a>
+                <a href="/chat" class="active">AI Chat</a>
+                <a href="/logout" class="logout-link">Logout</a>
+            </div>
+            <div class="user-info">
+                <span>👤 {{ user.username }}</span>
+            </div>
+        </div>
+    <a href="/leaderboard" class="nav-item">
+                    <span class="nav-icon">🏆</span>
+                    <span class="nav-text">Leaderboard</span>
+                </a>
+            </nav>
+
+    <main>
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>🤖 Chat with Mirror-X</h2>
+                <p>Ask anything about your study habits</p>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <strong>Mirror-X:</strong> I'm here to analyze your study patterns and give you brutal, data-driven feedback. Ask me anything about your habits, consistency, or how to improve.
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <form id="chatForm" class="chat-form">
+                    <input 
+                        type="text" 
+                        id="messageInput" 
+                        placeholder="Ask about your study habits..." 
+                        required
+                        autocomplete="off"
+                    >
+                    <button type="submit" id="sendButton">
+                        <span>Send</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="chat-suggestions">
+                <p>Try asking:</p>
+                <div class="suggestion-chips">
+                    <button class="suggestion-chip" onclick="askQuestion('Why am I failing?')">
+                        Why am I failing?
+                    </button>
+                    <button class="suggestion-chip" onclick="askQuestion('How do I improve?')">
+                        How do I improve?
+                    </button>
+                    <button class="suggestion-chip" onclick="askQuestion('Am I consistent?')">
+                        Am I consistent?
+                    </button>
+                    <button class="suggestion-chip" onclick="askQuestion('What is my biggest problem?')">
+                        What is my biggest problem?
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const chatForm = document.getElementById('chatForm');
+        const messageInput = document.getElementById('messageInput');
+        const chatMessages = document.getElementById('chatMessages');
+        const sendButton = document.getElementById('sendButton');
+
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.innerHTML = `<strong>${isUser ? 'You' : 'Mirror-X'}:</strong> ${content}`;
+            
+            messageDiv.appendChild(messageContent);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function setLoading(isLoading) {
+            sendButton.disabled = isLoading;
+            messageInput.disabled = isLoading;
+            sendButton.innerHTML = isLoading ? '<span>...</span>' : '<span>Send</span>';
+        }
+
+        async function sendMessage(message) {
+            setLoading(true);
+            addMessage(message, true);
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `message=${encodeURIComponent(message)}`
+                });
+
+                const data = await response.json();
+                addMessage(data.response);
+            } catch (error) {
+                addMessage('Error: Failed to get response from Mirror-X.');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        function askQuestion(question) {
+            messageInput.value = question;
+            chatForm.dispatchEvent(new Event('submit'));
+        }
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = messageInput.value.trim();
+            if (message) {
+                await sendMessage(message);
+                messageInput.value = '';
+            }
+        });
+
+        // Auto-focus on input
+        messageInput.focus();
+    </script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Study - MIRROR-X</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <h1>MIRROR-X</h1>
+            <div class="nav-links">
+                <a href="/">Dashboard</a>
+                <a href="/log" class="active">Log Study</a>
+                <a href="/analysis">Analysis</a>
+                <a href="/mirror">Mirror Report</a>
+                <a href="/chat">AI Chat</a>
+                <a href="/logout" class="logout-link">Logout</a>
+            </div>
+            <div class="user-info">
+                <span>👤 {{ user.username }}</span>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <div class="form-container">
+            <h2>Log Study Session</h2>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST" class="study-form">
+                <div class="form-group">
+                    <label for="subject">Subject</label>
+                    <select name="subject" id="subject" required>
+                        <option value="">Select a subject</option>
+                        {% for subject in subjects %}
+                        <option value="{{ subject }}">{{ subject }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="hours">Hours Studied</label>
+                    <input type="number" id="hours" name="hours" min="0" max="12" step="0.5" required placeholder="0.0 - 12.0">
+                </div>
+
+                <div class="form-group">
+                    <label for="difficulty">Difficulty</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="difficulty" value="easy" required>
+                            <span>Easy</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="difficulty" value="medium" required>
+                            <span>Medium</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="difficulty" value="hard" required>
+                            <span>Hard</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">Log Session</button>
+            </form>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Tasks - MIRROR-X</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🪞</span>
+                    <span class="logo-text">MIRROR-X</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="/log" class="nav-item">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Log Study</span>
+                </a>
+                <a href="/analysis" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analysis</span>
+                </a>
+                <a href="/mirror" class="nav-item">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Mirror Report</span>
+                </a>
+                <a href="/streak" class="nav-item">
+                    <span class="nav-icon">🔥</span>
+                    <span class="nav-text">Streak History</span>
+                </a>
+                <a href="/leaderboard" class="nav-item">
+                    <span class="nav-icon">🏆</span>
+                    <span class="nav-text">Leaderboard</span>
+                </a>
+                <a href="/daily_tasks" class="nav-item active">
+                    <span class="nav-icon">✅</span>
+                    <span class="nav-text">Daily Tasks</span>
+                </a>
+                <a href="/plan" class="nav-item">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">AI Study Plan</span>
+                </a>
+                <a href="/chat" class="nav-item">
+                    <span class="nav-icon">💬</span>
+                    <span class="nav-text">AI Chat</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <span>{{ user.username[0]|upper }}</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">{{ user.username }}</span>
+                        <a href="/logout" class="logout-btn">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-left">
+                    <h1>Daily Tasks</h1>
+                    <p class="header-subtitle">Complete all 3 tasks or face failure</p>
+                </div>
+                <div class="header-right">
+                    <div class="progress-tracker">
+                        <div class="progress-circle">
+                            <div class="progress-fill" style="width: {{ completion_status }}%"></div>
+                        </div>
+                        <span class="progress-text">{{ completion_status }}%</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="tasks-content">
+                {% if tasks %}
+                <div class="tasks-header">
+                    <h2>Today's Mandatory Tasks</h2>
+                    <p class="tasks-subtitle">Based on your weak subjects</p>
+                </div>
+                
+                <div class="tasks-list">
+                    {% for task in tasks %}
+                    <div class="task-item {{ 'completed' if task.completed else 'incomplete' }}">
+                        <div class="task-checkbox">
+                            <input type="checkbox" 
+                                   id="task-{{ task.id }}" 
+                                   {% if task.completed %}checked{% endif %}
+                                   onchange="markTaskComplete({{ task.id }}, this.checked)">
+                        </div>
+                        <div class="task-content">
+                            <div class="task-subject">{{ task.subject }}</div>
+                            <div class="task-difficulty {{ task.difficulty }}">{{ task.difficulty }}</div>
+                            <div class="task-description">{{ task.task }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="tasks-footer">
+                    <button onclick="markAllComplete()" class="complete-all-btn">
+                        <span>Mark All Complete</span>
+                    </button>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <h2>No Tasks Available</h2>
+                    <p>Start logging study sessions to generate personalized daily tasks.</p>
+                    <a href="/log" class="cta-button">
+                        <span>Start Studying</span>
+                        <span class="button-arrow">→</span>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function markTaskComplete(taskId, checkbox) {
+            fetch('/complete_task', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    'task_id': taskId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    checkbox.checked = true;
+                    checkbox.disabled = true;
+                    updateProgress();
+                } else {
+                    alert('Failed to mark task as complete');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        
+        function markAllComplete() {
+            const checkboxes = document.querySelectorAll('.task-checkbox');
+            const taskIds = Array.from(checkboxes).map(cb => cb.id.replace('task-', ''));
+            
+            if (confirm('Mark all tasks as complete? This cannot be undone.')) {
+                fetch('/complete_all_tasks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        'task_ids': taskIds
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        checkboxes.forEach(cb => {
+                            cb.checked = true;
+                            cb.disabled = true;
+                        });
+                        updateProgress();
+                    } else {
+                        alert('Failed to mark all tasks as complete');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+        
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.task-checkbox');
+            const completed = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const total = checkboxes.length;
+            const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+            
+            document.querySelector('.progress-fill').style.width = percentage + '%';
+            document.querySelector('.progress-text').textContent = percentage + '%';
+            
+            // Check if all tasks completed
+            if (percentage === 100) {
+                document.querySelector('.progress-tracker').classList.add('completed');
+            } else {
+                document.querySelector('.progress-tracker').classList.remove('completed');
+            }
+        }
+        
+        // Initialize progress on page load
+        updateProgress();
+    </script>
+</body>
+</html>

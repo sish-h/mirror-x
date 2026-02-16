@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard - MIRROR-X</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🪞</span>
+                    <span class="logo-text">MIRROR-X</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="/log" class="nav-item">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Log Study</span>
+                </a>
+                <a href="/analysis" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analysis</span>
+                </a>
+                <a href="/mirror" class="nav-item">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Mirror Report</span>
+                </a>
+                <a href="/leaderboard" class="nav-item active">
+                    <span class="nav-icon">🏆</span>
+                    <span class="nav-text">Leaderboard</span>
+                </a>
+                <a href="/chat" class="nav-item">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">AI Chat</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <span>{{ user.username[0].upper() }}</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">{{ user.username }}</span>
+                        <a href="/logout" class="logout-btn">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-left">
+                    <h1>Global Leaderboard</h1>
+                    <p class="header-subtitle">Top performers across all MIRROR-X users</p>
+                </div>
+                <div class="header-right">
+                    <div class="your-rank-card">
+                        <span class="rank-label">Your Rank</span>
+                        <span class="rank-number">#{{ your_rank }}</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="leaderboard-content">
+                <!-- Top 3 Podium -->
+                <div class="podium-section">
+                    <div class="podium">
+                        {% if top_users|length >= 1 %}
+                        <div class="podium-position first">
+                            <div class="rank-badge">🥇</div>
+                            <div class="user-info-card">
+                                <div class="user-avatar-large">{{ top_users[0].username[0].upper() }}</div>
+                                <div class="user-details">
+                                    <div class="username">{{ top_users[0].username }}</div>
+                                    <div class="score">{{ top_users[0].discipline_score }} pts</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if top_users|length >= 2 %}
+                        <div class="podium-position second">
+                            <div class="rank-badge">🥈</div>
+                            <div class="user-info-card">
+                                <div class="user-avatar-large">{{ top_users[1].username[0].upper() }}</div>
+                                <div class="user-details">
+                                    <div class="username">{{ top_users[1].username }}</div>
+                                    <div class="score">{{ top_users[1].discipline_score }} pts</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        {% if top_users|length >= 3 %}
+                        <div class="podium-position third">
+                            <div class="rank-badge">🥉</div>
+                            <div class="user-info-card">
+                                <div class="user-avatar-large">{{ top_users[2].username[0].upper() }}</div>
+                                <div class="user-details">
+                                    <div class="username">{{ top_users[2].username }}</div>
+                                    <div class="score">{{ top_users[2].discipline_score }} pts</div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Leaderboard Table -->
+                <div class="leaderboard-table-section">
+                    <div class="table-header">
+                        <h2>All Rankings</h2>
+                        <div class="filter-tabs">
+                            <button class="filter-tab active" onclick="filterTable('all')">All Time</button>
+                            <button class="filter-tab" onclick="filterTable('week')">This Week</button>
+                            <button class="filter-tab" onclick="filterTable('month')">This Month</button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table class="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>User</th>
+                                    <th>Discipline</th>
+                                    <th>Consistency</th>
+                                    <th>Total Hours</th>
+                                    <th>Streak</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in leaderboard %}
+                                <tr class="{{ 'current-user' if user.id == current_user.id else '' }}">
+                                    <td class="rank-cell">
+                                        <span class="rank-number">#{{ loop.index + 1 }}</span>
+                                        {% if loop.index == 0 %}<span class="rank-crown">👑</span>{% endif %}
+                                        {% if loop.index == 1 %}<span class="rank-medal">🥈</span>{% endif %}
+                                        {% if loop.index == 2 %}<span class="rank-medal">🥉</span>{% endif %}
+                                    </td>
+                                    <td class="user-cell">
+                                        <div class="user-info-row">
+                                            <div class="user-avatar-small">{{ user.username[0].upper() }}</div>
+                                            <span class="username">{{ user.username }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="score-cell">
+                                        <span class="discipline-score {{ 'score-high' if user.discipline_score > 70 else 'score-medium' if user.discipline_score > 40 else 'score-low' }}">
+                                            {{ user.discipline_score }}
+                                        </span>
+                                    </td>
+                                    <td class="score-cell">
+                                        <span class="consistency-score {{ 'score-high' if user.consistency > 70 else 'score-medium' if user.consistency > 40 else 'score-low' }}">
+                                            {{ "%.1f"|format(user.consistency) }}%
+                                        </span>
+                                    </td>
+                                    <td class="hours-cell">{{ "%.1f"|format(user.total_hours) }}</td>
+                                    <td class="streak-cell">{{ user.current_streak }} days</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Stats Summary -->
+                <div class="stats-summary">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-content">
+                                <h3>Total Users</h3>
+                                <div class="stat-value">{{ total_users }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-content">
+                                <h3>Avg Discipline</h3>
+                                <div class="stat-value">{{ "%.1f"|format(average_discipline) }}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">📅</div>
+                            <div class="stat-content">
+                                <h3>Avg Consistency</h3>
+                                <div class="stat-value">{{ "%.1f"|format(average_consistency) }}%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">🔥</div>
+                            <div class="stat-content">
+                                <h3>Top Streak</h3>
+                                <div class="stat-value">{{ top_streak }} days</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function filterTable(period) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Here you would typically make an AJAX call to filter data
+            // For now, we'll just show a message
+            console.log('Filtering by:', period);
+            
+            // In a real implementation, you would:
+            // fetch(`/leaderboard?period=${period}`)
+            //   .then(response => response.json())
+            //   .then(data => updateTable(data));
+        }
+        
+        function updateTable(data) {
+            // Update table with filtered data
+            const tbody = document.querySelector('.leaderboard-table tbody');
+            tbody.innerHTML = data.table_html;
+        }
+    </script>
+</body>
+</html>

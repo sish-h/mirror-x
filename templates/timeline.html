@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline - MIRROR-X</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🪞</span>
+                    <span class="logo-text">MIRROR-X</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="/log" class="nav-item">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Log Study</span>
+                </a>
+                <a href="/analysis" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analysis</span>
+                </a>
+                <a href="/mirror" class="nav-item">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Mirror Report</span>
+                </a>
+                <a href="/streak" class="nav-item">
+                    <span class="nav-icon">🔥</span>
+                    <span class="nav-text">Streak History</span>
+                </a>
+                <a href="/leaderboard" class="nav-item">
+                    <span class="nav-icon">🏆</span>
+                    <span class="nav-text">Leaderboard</span>
+                </a>
+                <a href="/timeline" class="nav-item active">
+                    <span class="nav-icon">📅</span>
+                    <span class="nav-text">Timeline</span>
+                </a>
+                <a href="/competitor" class="nav-item">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">AI Competitor</span>
+                </a>
+                <a href="/plan" class="nav-item">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">AI Study Plan</span>
+                </a>
+                <a href="/chat" class="nav-item">
+                    <span class="nav-icon">💬</span>
+                    <span class="nav-text">AI Chat</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <span>{{ user.username[0]|upper }}</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">{{ user.username }}</span>
+                        <a href="/logout" class="logout-btn">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-left">
+                    <h1>Your Reality Timeline</h1>
+                    <p class="header-subtitle">Daily performance over time</p>
+                </div>
+                <div class="header-right">
+                    <div class="timeline-filters">
+                        <select id="timeFilter" class="filter-select">
+                            <option value="30">Last 30 Days</option>
+                            <option value="60">Last 60 Days</option>
+                            <option value="90">Last 90 Days</option>
+                            <option value="all">All Time</option>
+                        </select>
+                    </div>
+                </div>
+            </header>
+
+            <div class="timeline-content">
+                {% if timeline_data %}
+                <div class="timeline-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-content">
+                            <h3>Total Days</h3>
+                            <div class="stat-value">{{ timeline_data.total_days }}</div>
+                            <div class="stat-label">Days Tracked</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <h3>Good Days</h3>
+                            <div class="stat-value good">{{ timeline_data.good_days }}</div>
+                            <div class="stat-label">Productive Days</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">❌</div>
+                        <div class="stat-content">
+                            <h3>Bad Days</h3>
+                            <div class="stat-value bad">{{ timeline_data.bad_days }}</div>
+                            <div class="stat-label">Unproductive Days</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">🔄</div>
+                        <div class="stat-content">
+                            <h3>Relapses</h3>
+                            <div class="stat-value warning">{{ timeline_data.relapses }}</div>
+                            <div class="stat-label">Pattern Breaks</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timeline-chart">
+                    <h2>Daily Performance</h2>
+                    <div class="chart-container">
+                        {% for day in timeline_data.days %}
+                        <div class="timeline-day {{ 'good' if day.is_good else 'bad' if day.is_bad else 'neutral' }}">
+                            <div class="day-header">
+                                <div class="day-date">{{ day.date }}</div>
+                                <div class="day-status">
+                                    {% if day.is_good %}
+                                        <span class="status-icon good">✅</span>
+                                        <span class="status-text">Good Day</span>
+                                    {% elif day.is_bad %}
+                                        <span class="status-icon bad">❌</span>
+                                        <span class="status-text">Bad Day</span>
+                                    {% else %}
+                                        <span class="status-icon neutral">⚪</span>
+                                        <span class="status-text">Neutral</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="day-metrics">
+                                <div class="metric">
+                                    <span class="metric-label">Hours</span>
+                                    <span class="metric-value">{{ day.hours }}</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">Discipline</span>
+                                    <span class="metric-value">{{ day.discipline_score }}</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-label">Streak</span>
+                                    <span class="metric-value">{{ day.streak }}</span>
+                                </div>
+                            </div>
+                            {% if day.is_relapse %}
+                                <div class="relapse-marker">
+                                    <span class="relapse-icon">🔄</span>
+                                    <span class="relapse-text">RELAPSE</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="streak-history">
+                    <h2>Streak History</h2>
+                    <div class="streak-list">
+                        {% for streak in timeline_data.streak_history %}
+                        <div class="streak-item">
+                            <div class="streak-period">
+                                <div class="streak-dates">
+                                    <span class="start-date">{{ streak.start_date }}</span>
+                                    <span class="streak-arrow">→</span>
+                                    <span class="end-date">{{ streak.end_date }}</span>
+                                </div>
+                                <div class="streak-length">{{ streak.length }} days</div>
+                            </div>
+                            <div class="streak-status {{ 'active' if streak.is_active else 'completed' }}">
+                                {% if streak.is_active %}
+                                    <span class="status-icon">🔥</span>
+                                    <span class="status-text">Active</span>
+                                {% else %}
+                                    <span class="status-icon">✅</span>
+                                    <span class="status-text">Completed</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📅</div>
+                    <h2>No Timeline Data</h2>
+                    <p>Start logging study sessions to build your reality timeline.</p>
+                    <a href="/log" class="cta-button">
+                        <span>Start Studying</span>
+                        <span class="button-arrow">→</span>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function filterTimeline() {
+            const filter = document.getElementById('timeFilter').value;
+            window.location.href = `/timeline?filter=${filter}`;
+        }
+        
+        document.getElementById('timeFilter').addEventListener('change', filterTimeline);
+    </script>
+</body>
+</html>

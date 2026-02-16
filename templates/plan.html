@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Study Plan - MIRROR-X</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🪞</span>
+                    <span class="logo-text">MIRROR-X</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="/log" class="nav-item">
+                    <span class="nav-icon">📝</span>
+                    <span class="nav-text">Log Study</span>
+                </a>
+                <a href="/analysis" class="nav-item">
+                    <span class="nav-icon">📈</span>
+                    <span class="nav-text">Analysis</span>
+                </a>
+                <a href="/mirror" class="nav-item">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Mirror Report</span>
+                </a>
+                <a href="/streak" class="nav-item">
+                    <span class="nav-icon">🔥</span>
+                    <span class="nav-text">Streak History</span>
+                </a>
+                <a href="/leaderboard" class="nav-item">
+                    <span class="nav-icon">🏆</span>
+                    <span class="nav-text">Leaderboard</span>
+                </a>
+                <a href="/plan" class="nav-item active">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">AI Study Plan</span>
+                </a>
+                <a href="/chat" class="nav-item">
+                    <span class="nav-icon">💬</span>
+                    <span class="nav-text">AI Chat</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <span>{{ user.username[0]|upper }}</span>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">{{ user.username }}</span>
+                        <a href="/logout" class="logout-btn">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="content-header">
+                <div class="header-left">
+                    <h1>AI Study Plan Generator</h1>
+                    <p class="header-subtitle">Personalized schedule based on your patterns and weaknesses</p>
+                </div>
+                <div class="header-right">
+                    <button onclick="generatePlan()" class="generate-plan-btn">
+                        <span>🤖</span>
+                        <span>Generate Plan</span>
+                    </button>
+                </div>
+            </header>
+
+            <div class="plan-content">
+                {% if not plan_generated %}
+                <!-- Input Section -->
+                <div class="input-section">
+                    <h2>Your Study Profile</h2>
+                    <div class="input-grid">
+                        <div class="input-card">
+                            <h3>Weak Subjects</h3>
+                            <div class="subject-inputs">
+                                <div class="subject-input-group">
+                                    <input type="text" id="subject1" placeholder="Subject name" class="subject-input">
+                                    <select id="difficulty1" class="difficulty-select">
+                                        <option value="easy">Easy</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="hard">Hard</option>
+                                    </select>
+                                </div>
+                                <div class="subject-input-group">
+                                    <input type="text" id="subject2" placeholder="Subject name" class="subject-input">
+                                    <select id="difficulty2" class="difficulty-select">
+                                        <option value="easy">Easy</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="hard">Hard</option>
+                                    </select>
+                                </div>
+                                <div class="subject-input-group">
+                                    <input type="text" id="subject3" placeholder="Subject name" class="subject-input">
+                                    <select id="difficulty3" class="difficulty-select">
+                                        <option value="easy">Easy</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="hard">Hard</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="input-card">
+                            <h3>Study Patterns</h3>
+                            <div class="pattern-inputs">
+                                <label class="pattern-label">
+                                    <input type="checkbox" id="morning_person" class="pattern-checkbox">
+                                    <span>Morning Person (6AM-12PM)</span>
+                                </label>
+                                <label class="pattern-label">
+                                    <input type="checkbox" id="afternoon_person" class="pattern-checkbox">
+                                    <span>Afternoon Person (12PM-6PM)</span>
+                                </label>
+                                <label class="pattern-label">
+                                    <input type="checkbox" id="evening_person" class="pattern-checkbox">
+                                    <span>Evening Person (6PM-12AM)</span>
+                                </label>
+                                <label class="pattern-label">
+                                    <input type="checkbox" id="weekend_warrior" class="pattern-checkbox">
+                                    <span>Weekend Warrior</span>
+                                </label>
+                                <label class="pattern-label">
+                                    <input type="checkbox" id="procrastinator" class="pattern-checkbox">
+                                    <span>Procrastinator (Last minute)</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="input-card">
+                            <h3>Avoidance Patterns</h3>
+                            <div class="avoidance-inputs">
+                                <label class="avoidance-label">
+                                    <input type="checkbox" id="avoid_hard" class="avoidance-checkbox">
+                                    <span>Avoid Hard Subjects</span>
+                                </label>
+                                <label class="avoidance-label">
+                                    <input type="checkbox" id="avoid_morning" class="avoidance-checkbox">
+                                    <span>Avoid Morning Study</span>
+                                </label>
+                                <label class="avoidance-label">
+                                    <input type="checkbox" id="avoid_long_sessions" class="avoidance-checkbox">
+                                    <span>Avoid Long Sessions</span>
+                                </label>
+                                <label class="avoidance-label">
+                                    <input type="checkbox" id="avoid_consistency" class="avoidance-checkbox">
+                                    <span>Inconsistent Schedule</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="schedule-preferences">
+                        <h3>Daily Schedule Preferences</h3>
+                        <div class="preference-grid">
+                            <div class="preference-item">
+                                <label for="daily_hours">Daily Study Hours</label>
+                                <input type="number" id="daily_hours" min="1" max="12" value="4" class="preference-input">
+                            </div>
+                            <div class="preference-item">
+                                <label for="sessions_per_day">Sessions Per Day</label>
+                                <input type="number" id="sessions_per_day" min="1" max="10" value="2" class="preference-input">
+                            </div>
+                            <div class="preference-item">
+                                <label for="session_length">Session Length (hours)</label>
+                                <input type="number" id="session_length" min="0.5" max="6" step="0.5" value="2" class="preference-input">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button onclick="generatePlan()" class="fix-life-btn">
+                        <span>🔧</span>
+                        <span>Fix My Life</span>
+                    </button>
+                </div>
+                {% else %}
+                <!-- Generated Plan -->
+                <div class="generated-plan">
+                    <div class="plan-header">
+                        <h2>Your Personalized Study Plan</h2>
+                        <div class="plan-meta">
+                            <span class="plan-date">Generated on {{ plan_date }}</span>
+                            <button onclick="regeneratePlan()" class="regenerate-btn">Regenerate</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Daily Schedule -->
+                    <div class="schedule-section">
+                        <h3>Daily Schedule</h3>
+                        <div class="schedule-grid">
+                            {% for day in schedule %}
+                            <div class="day-card">
+                                <div class="day-header">
+                                    <h4>{{ day.name }}</h4>
+                                    <span class="day-total">{{ day.total_hours }}h total</span>
+                                </div>
+                                <div class="day-sessions">
+                                    {% for session in day.sessions %}
+                                    <div class="session-item">
+                                        <div class="session-time">{{ session.time }}</div>
+                                        <div class="session-subject">{{ session.subject }}</div>
+                                        <div class="session-duration">{{ session.duration }}h</div>
+                                        <div class="session-difficulty {{ session.difficulty }}">{{ session.difficulty }}</div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Subject Priority -->
+                    <div class="priority-section">
+                        <h3>Subject Priority Order</h3>
+                        <div class="priority-list">
+                            {% for subject in subject_priority %}
+                            <div class="priority-item">
+                                <div class="priority-rank">{{ loop.index + 1 }}</div>
+                                <div class="priority-info">
+                                    <div class="priority-subject">{{ subject.name }}</div>
+                                    <div class="priority-reason">{{ subject.reason }}</div>
+                                </div>
+                                <div class="priority-hours">{{ subject.recommended_hours }}h/week</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Hours Allocation -->
+                    <div class="allocation-section">
+                        <h3>Weekly Hours Allocation</h3>
+                        <div class="allocation-chart">
+                            {% for subject in hours_allocation %}
+                            <div class="allocation-item">
+                                <div class="allocation-bar">
+                                    <div class="allocation-fill" style="width: {{ subject.percentage }}%; background: {{ subject.color }};"></div>
+                                </div>
+                                <div class="allocation-info">
+                                    <div class="allocation-subject">{{ subject.name }}</div>
+                                    <div class="allocation-hours">{{ subject.hours }}h ({{ subject.percentage }}%)</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Implementation Tips -->
+                    <div class="tips-section">
+                        <h3>Implementation Tips</h3>
+                        <div class="tips-list">
+                            {% for tip in implementation_tips %}
+                            <div class="tip-item">
+                                <div class="tip-icon">{{ tip.icon }}</div>
+                                <div class="tip-content">
+                                    <div class="tip-title">{{ tip.title }}</div>
+                                    <div class="tip-description">{{ tip.description }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function generatePlan() {
+            const formData = {
+                weak_subjects: [
+                    { name: document.getElementById('subject1').value, difficulty: document.getElementById('difficulty1').value },
+                    { name: document.getElementById('subject2').value, difficulty: document.getElementById('difficulty2').value },
+                    { name: document.getElementById('subject3').value, difficulty: document.getElementById('difficulty3').value }
+                ].filter(s => s.name.trim() !== ''),
+                patterns: {
+                    morning_person: document.getElementById('morning_person').checked,
+                    afternoon_person: document.getElementById('afternoon_person').checked,
+                    evening_person: document.getElementById('evening_person').checked,
+                    weekend_warrior: document.getElementById('weekend_warrior').checked,
+                    procrastinator: document.getElementById('procrastinator').checked
+                },
+                avoidance: {
+                    avoid_hard: document.getElementById('avoid_hard').checked,
+                    avoid_morning: document.getElementById('avoid_morning').checked,
+                    avoid_long_sessions: document.getElementById('avoid_long_sessions').checked,
+                    avoid_consistency: document.getElementById('avoid_consistency').checked
+                },
+                preferences: {
+                    daily_hours: parseInt(document.getElementById('daily_hours').value),
+                    sessions_per_day: parseInt(document.getElementById('sessions_per_day').value),
+                    session_length: parseFloat(document.getElementById('session_length').value)
+                }
+            };
+            
+            fetch('/generate_plan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to generate plan: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error generating plan');
+            });
+        }
+        
+        function regeneratePlan() {
+            if (confirm('Generate a new study plan? This will replace your current plan.')) {
+                fetch('/regenerate_plan', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>
